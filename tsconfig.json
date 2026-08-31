@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM"],
+    "types": ["cypress", "node"],
+    "module": "CommonJS",
+    "allowSyntheticDefaultImports": true,
+    "useDefineForClassFields": false,
+    "paths": {
+      "@cypress/*": ["./cypress/*"]
+    }
+  },
+  "include": ["**/*.ts", "./eslint-local-rules.js"],
+  "exclude": ["node_modules"]
+}
