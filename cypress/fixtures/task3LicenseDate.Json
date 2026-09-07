@@ -1,21 +1,17 @@
- 
- 
 [
-{   
-    "licenseExpiryDate": "2022-21-0"
-},
-{ 
-    "licenseExpiryDate": "222-21-09"
-},
-{    
-    "licenseExpiryDate": "202221-09"
-},
-{    
-    "licenseExpiryDate": "2022-21-09"
-},
-{    
-    "licenseExpiryDate": "2022-2-09"
-}
+    {
+        "licenseExpiryDate": "2022-21-0"
+    },
+    {
+        "licenseExpiryDate": "222-21-09"
+    },
+    {
+        "licenseExpiryDate": "202221-09"
+    },
+    {
+        "licenseExpiryDate": "2022-21-09"
+    },
+    {
+        "licenseExpiryDate": "2022-2-09"
+    }
 ]
-
-
