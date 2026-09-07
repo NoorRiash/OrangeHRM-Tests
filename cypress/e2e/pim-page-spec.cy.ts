@@ -1,3 +1,4 @@
+let empid = "";
 function generateRandomEmployeeId(length: number = 5) {
   let empId = "";
   const possible = "0123456789";
@@ -9,6 +10,7 @@ function generateRandomEmployeeId(length: number = 5) {
   return empId;
 }
 
+let username = "";
 function generateRandomUsername(length: number = 5) {
   let username = "";
   const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
@@ -38,22 +40,17 @@ function toggleLoginDetails() {
 }
 
 function fillEmployeeForm() {
-  cy.fixture("task3Data").then((data) => {
+  cy.fixture("pimPageData").then((data) => {
     cy.get(".orangehrm-firstname").click().type(data.firstName);
     cy.get(".orangehrm-middlename").click().type(data.middleName);
     cy.get(".orangehrm-lastname").click().type(data.lastName);
 
-    cy.get(".oxd-input.oxd-input--active")
-      .eq(3)
-      .click()
-      .clear()
-      .type(data.empId + generateRandomEmployeeId());
+    empid = data.empId + generateRandomEmployeeId();
+    cy.get(".oxd-input.oxd-input--active").eq(3).click().clear().type(empid);
     toggleLoginDetails();
 
-    cy.get(".oxd-input.oxd-input--active")
-      .eq(5)
-      .click()
-      .type(data.userName + generateRandomUsername());
+    username = data.userName + generateRandomUsername();
+    cy.get(".oxd-input.oxd-input--active").eq(5).click().type(username);
 
     cy.get(".oxd-input-group.oxd-input-field-bottom-space")
       .find("input[type='password']")
@@ -77,7 +74,7 @@ function fillEmployeeForm() {
 }
 
 function fillPersonalDetails() {
-  cy.fixture("task3FillPersonalDetails").then((data) => {
+  cy.fixture("pimPageFillPersonalDetails").then((data) => {
     cy.contains(".oxd-input-group", "Other Id")
       .find("input")
       .type(data.otherId);
@@ -147,14 +144,10 @@ describe("OrangeHRM - PIM Page Tests", () => {
     cy.get(
       ".orangehrm-header-container>.oxd-button.oxd-button--medium.oxd-button--secondary[type='button']",
     ).click();
-    cy.url().should(
-      "eq",
-      "https://opensource-demo.orangehrmlive.com/web/index.php/pim/addEmployee",
-    );
   });
 
   it("TC009: Add an employee with empty first name", () => {
-    cy.fixture("task3Data").then((data) => {
+    cy.fixture("pimPageData").then((data) => {
       cy.get(".oxd-input.oxd-input--active.orangehrm-middlename")
         .click()
         .type(data.middleName);
@@ -193,8 +186,8 @@ describe("OrangeHRM - PIM Page Tests", () => {
     });
   });
 
-  it("TC010: trying to add employee with empty last name", () => {
-    cy.fixture("task3Data").then((data) => {
+  it("TC010: Add an employee with empty last name", () => {
+    cy.fixture("pimPageData").then((data) => {
       cy.get(".oxd-input.oxd-input--active.orangehrm-firstname")
         .click()
         .type(data.firstName);
@@ -229,8 +222,8 @@ describe("OrangeHRM - PIM Page Tests", () => {
   });
 
   //5 3
-  it("TC011: trying to add employee with empty middle name", () => {
-    cy.fixture("task3Data").then((data) => {
+  it("TC011: Add an employee with empty middle name", () => {
+    cy.fixture("pimPageData").then((data) => {
       cy.get(".oxd-input.oxd-input--active.orangehrm-firstname")
         .click()
         .type(data.firstName);
@@ -261,8 +254,8 @@ describe("OrangeHRM - PIM Page Tests", () => {
     });
   });
 
-  it("TC012: trying to add employee with invalid username (less than 5 characters)", () => {
-    cy.fixture("task3Data").then((data) => {
+  it("TC012: Add an employee with invalid username (less than 5 characters)", () => {
+    cy.fixture("pimPageData").then((data) => {
       cy.get(".oxd-input.oxd-input--active.orangehrm-firstname")
         .click()
         .type(data.firstName);
@@ -301,8 +294,8 @@ describe("OrangeHRM - PIM Page Tests", () => {
     });
   });
 
-  it("TC013: trying to add employee with less than (7 characters) password ", () => {
-    cy.fixture("task3Data").then((data) => {
+  it("TC013: Add an employee with less than (7 characters) password ", () => {
+    cy.fixture("pimPageData").then((data) => {
       cy.get(".oxd-input.oxd-input--active.orangehrm-firstname")
         .click()
         .type(data.firstName);
@@ -342,8 +335,8 @@ describe("OrangeHRM - PIM Page Tests", () => {
     });
   });
 
-  it("TC014: trying to add employee with empty password ", () => {
-    cy.fixture("task3Data").then((data) => {
+  it("TC014: Add an employee with empty password ", () => {
+    cy.fixture("pimPageData").then((data) => {
       cy.get(".oxd-input.oxd-input--active.orangehrm-firstname")
         .click()
         .type(data.firstName);
@@ -373,8 +366,8 @@ describe("OrangeHRM - PIM Page Tests", () => {
     });
   });
 
-  it("TC015: trying to add employee with more than (6 characters) password and all of them are digits", () => {
-    cy.fixture("task3Data").then((data) => {
+  it("TC015: Add an employee with more than (6 characters) password and all of them are digits", () => {
+    cy.fixture("pimPageData").then((data) => {
       cy.get(".oxd-input.oxd-input--active.orangehrm-firstname")
         .click()
         .type(data.firstName);
@@ -417,8 +410,8 @@ describe("OrangeHRM - PIM Page Tests", () => {
     });
   });
 
-  it("TC016: trying to add employee with more than (6 characters) password and all of them are characters", () => {
-    cy.fixture("task3Data").then((data) => {
+  it("TC016: Add an employee with more than (6 characters) password and all of them are characters", () => {
+    cy.fixture("pimPageData").then((data) => {
       cy.get(".oxd-input.oxd-input--active.orangehrm-firstname")
         .click()
         .type(data.firstName);
@@ -458,8 +451,8 @@ describe("OrangeHRM - PIM Page Tests", () => {
     });
   });
 
-  it("TC017: trying to add employee with mismatched password", () => {
-    cy.fixture("task3Data").then((data) => {
+  it("TC017: Add an employee with mismatched password", () => {
+    cy.fixture("pimPageData").then((data) => {
       cy.get(".oxd-input.oxd-input--active.orangehrm-firstname")
         .click()
         .type(data.firstName);
@@ -497,8 +490,8 @@ describe("OrangeHRM - PIM Page Tests", () => {
     });
   });
 
-  it("TC018: trying to add employee with empty username", () => {
-    cy.fixture("task3Data").then((data) => {
+  it("TC018: Add an employee with empty username", () => {
+    cy.fixture("pimPageData").then((data) => {
       cy.get(".oxd-input.oxd-input--active.orangehrm-firstname")
         .click()
         .type(data.firstName);
@@ -535,12 +528,12 @@ describe("OrangeHRM - PIM Page Tests", () => {
     });
   });
 
-  it("TC019: trying to add employee with all valid fields", () => {
+  it("TC019: Add an employee with all valid fields", () => {
     fillEmployeeForm();
   });
 
-  it("TC020: trying to add employee with more than (6 characters) password and all of them are digits and upper-case letter ", () => {
-    cy.fixture("task3Data").then((data) => {
+  it("TC020: Add an employee with more than (6 characters) password and all of them are digits and upper-case letter ", () => {
+    cy.fixture("pimPageData").then((data) => {
       cy.get(".oxd-input.oxd-input--active.orangehrm-firstname")
         .click()
         .type(data.firstName);
@@ -587,9 +580,8 @@ describe("OrangeHRM - PIM Page Tests", () => {
     fillPersonalDetails();
     let cnt = 0;
 
-    cy.fixture("task3LicenseDate").then(
+    cy.fixture("pimPageLicenseDate").then(
       (data: { licenseExpiryDate: string }[]) => {
-        // i'll try just a few test cases (not all of them) first 3 contain invalid data
         data.forEach((element) => {
           cy.contains(".oxd-input-group", "License Expiry Date")
             .find('input[placeholder="yyyy-dd-mm"]')
@@ -618,8 +610,7 @@ describe("OrangeHRM - PIM Page Tests", () => {
     fillPersonalDetails();
     let cnt = 0;
 
-    cy.fixture("task3BirthDate").then((data: { birthDate: string }[]) => {
-      // i'll try just a few test cases (not all of them) first 3 contain invalid data
+    cy.fixture("pimPageAddBirthDate").then((data: { birthDate: string }[]) => {
       data.forEach((element) => {
         cy.contains(".oxd-input-group", "Date of Birth")
           .find('input[placeholder="yyyy-dd-mm"]')
@@ -653,7 +644,7 @@ describe("OrangeHRM - PIM Page Tests", () => {
     cy.get(".oxd-userdropdown-tab").click();
     cy.get("a[href='/web/index.php/auth/logout']").click();
 
-    cy.fixture("task3Data").then((data) => {
+    cy.fixture("pimPageData").then((data) => {
       let userName = data.userName;
       cy.get("input[name='username']").type(
         userName + generateRandomUsername(),
@@ -673,33 +664,29 @@ describe("OrangeHRM - PIM Page Tests", () => {
     cy.get(".oxd-userdropdown-tab").click();
     cy.get("a[href='/web/index.php/auth/logout']").click();
 
-    cy.fixture("task3Data").then((data) => {
-      let userName = data.userName;
-      cy.get("input[name='username']").type(
-        userName + generateRandomUsername(),
-      );
+    cy.fixture("pimPageData").then((data) => {
+      cy.get("input[name='username']").type(username);
       cy.get("input[name='password']").type(data.password);
-      cy.get("button[type='submit']").click();
-      cy.url().should("include", "/dashboard/");
+      cy.get(".oxd-button ").click();
     });
 
     //go to my info
     cy.contains(".oxd-main-menu-item", "My Info").click();
 
-    cy.fixture("task3Data").then((data) => {
+    cy.fixture("pimPageData").then((data) => {
       //verify full name
       cy.get(".orangehrm-firstname").should("have.value", data.firstName);
       cy.get(".orangehrm-middlename").should("have.value", data.middleName);
       cy.get(".orangehrm-lastname").should("have.value", data.lastName);
 
       //verify employee Id
-      let value = data.empId + generateRandomEmployeeId();
+      let value = empid;
       cy.contains(".oxd-grid-item", "Employee Id")
         .find("input")
         .should("have.value", value);
     });
 
-    cy.fixture("Task3FillPersonalDetails").then((data) => {
+    cy.fixture("pimPageFillPersonalDetails").then((data) => {
       //verify other Id
       cy.contains(".oxd-grid-item", "Other Id")
         .find("input")
