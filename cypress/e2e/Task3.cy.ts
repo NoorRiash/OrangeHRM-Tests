@@ -1,46 +1,23 @@
-let userN = "";
-let temId = "";
+function generateRandomEmployeeId(length: number = 5) {
+  let empId = "";
+  const possible = "0123456789";
 
-function addRandomDigits() {
-  cy.wait(2000);
-  cy.contains(".oxd-input-group", "Employee Id").then(($x) => {
-    const errorMsg = $x.find(".oxd-input-field-error-message");
-    if (
-      errorMsg.length > 0 &&
-      errorMsg.text().includes("Employee Id already exists")
-    ) {
-      const ch = Math.floor(Math.random() * 10).toString();
-      cy.wrap($x)
-        .find("input")
-        .type(ch)
-        .then(() => {
-          temId += ch;
-          cy.wait(5000);
-          addRandomDigits();
-        });
-    }
-  });
+  for (let i = 0; i < length; i++) {
+    empId += possible.charAt(Math.floor(Math.random() * possible.length));
+  }
+
+  return empId;
 }
 
-function addRandomCharacter() {
-  const characters = "abcdefghij";
-  cy.get(".oxd-button.oxd-button--medium").eq(1).click();
-  cy.wait(2000);
-  cy.contains(".oxd-input-group", "Username").then(($x) => {
-    const errorMsg = $x.find(".oxd-input-field-error-message");
-    if (
-      errorMsg.length > 0 &&
-      errorMsg.text().includes("Username already exists")
-    ) {
-      const ch = characters.charAt(
-        Math.floor(Math.random() * characters.length),
-      );
-      cy.wrap($x).find("input").click().type(ch);
-      userN += ch;
-      cy.get(".oxd-button.oxd-button--medium").eq(1).click();
-      addRandomCharacter();
-    }
-  });
+function generateRandomUsername(length: number = 5) {
+  let username = "";
+  const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+  for (let i = 0; i < length; i++) {
+    username += possible.charAt(Math.floor(Math.random() * possible.length));
+  }
+
+  return username;
 }
 
 let date1 = "2000-08-08";
@@ -54,14 +31,13 @@ function fillValidDates() {
     .type(date1);
 }
 
-function doo() {
+function toggleLoginDetails() {
   cy.get(".oxd-switch-input.oxd-switch-input--active").click(); // to create log in details
   cy.get(".oxd-label.oxd-input-field-required").eq(1).should("be.visible"); //just for validation
-  cy.get(".oxd-input-group.oxd-input-field-bottom-space").eq(6).click(); //enabel
-  // cy.get("oxd-input-group.oxd-input-field-bottom-space").eq(7).click(); //disable
+  cy.get(".oxd-input-group.oxd-input-field-bottom-space").eq(6).click(); //enable
 }
 
-function validEmpInfo() {
+function fillEmployeeForm() {
   cy.fixture("task3Data").then((data) => {
     cy.get(".orangehrm-firstname").click().type(data.firstName);
     cy.get(".orangehrm-middlename").click().type(data.middleName);
@@ -71,11 +47,13 @@ function validEmpInfo() {
       .eq(3)
       .click()
       .clear()
-      .type(data.empId);
-    addRandomDigits();
-    doo();
-    cy.get(".oxd-input.oxd-input--active").eq(5).click().type(data.userName);
-    addRandomCharacter();
+      .type(data.empId + generateRandomEmployeeId());
+    toggleLoginDetails();
+
+    cy.get(".oxd-input.oxd-input--active")
+      .eq(5)
+      .click()
+      .type(data.userName + generateRandomUsername());
 
     cy.get(".oxd-input-group.oxd-input-field-bottom-space")
       .find("input[type='password']")
@@ -87,18 +65,14 @@ function validEmpInfo() {
       .eq(1)
       .type(data.password);
 
-    //////////////////validation
+    cy.intercept("GET", "**/web/index.php/api/v2/pim/employees").as(
+      "addEmployee",
+    );
+    cy.intercept("POST", "**/web/index.php/api/v2/admin/users").as("addUser");
 
-    // cy.intercept("GET","**/pim/viewPersonalDetails**").as( //2
-    //   "personalDetails",
-    // );
     cy.get(".oxd-button.oxd-button--medium").eq(1).click(); // save
-    cy.wait(5000);
-    // cy.wait("@personalDetails").its("response.statusCode").should("eq", 200);
 
-    //   //   cy.get(".orangehrm-tabs-wrapper").should("have.length", 10); //1
-
-    // cy.url().should("include", "/pim/viewPersonalDetails/empNumber/"); // smth went wrong //3
+    cy.wait(["@addEmployee", "@addUser"]);
   });
 }
 
@@ -152,7 +126,7 @@ function fillPersonalDetails() {
   });
 }
 
-describe("create new account on website", () => {
+describe("OrangeHRM - PIM Page Tests", () => {
   beforeEach(() => {
     //1
     cy.visit(
@@ -179,9 +153,8 @@ describe("create new account on website", () => {
     );
   });
 
-  it("TC009: trying to add employee with empty first name", () => {
+  it("TC009: Add an employee with empty first name", () => {
     cy.fixture("task3Data").then((data) => {
-      // cy.get(".oxd-input oxd-input--active.orangehrm-firstname").click().type(data.fistName);
       cy.get(".oxd-input.oxd-input--active.orangehrm-middlename")
         .click()
         .type(data.middleName);
@@ -195,15 +168,12 @@ describe("create new account on website", () => {
         .click()
         .clear()
         .type(data.empId);
-      addRandomDigits(); // fix id
+      generateRandomEmployeeId(); // fix id
 
-      doo();
+      toggleLoginDetails();
 
       cy.get(".oxd-input.oxd-input--active").eq(5).click().type(data.userName);
-      addRandomCharacter();
-
-      //   cy.get(".oxd-input.oxd-input--active").eq(5).click().type(data.password); // i don't know what's going on
-      //   cy.get(".oxd-input.oxd-input--active").eq(6).click().type(data.password);
+      generateRandomUsername();
 
       cy.get(".oxd-input-group.oxd-input-field-bottom-space")
         .find("input[type='password']")
@@ -232,12 +202,11 @@ describe("create new account on website", () => {
       cy.get(".oxd-input.oxd-input--active.orangehrm-middlename")
         .click()
         .type(data.middleName);
-      // cy.get("oxd-input oxd-input--active.orangehrm-lastname").click().type(data.lastName);
 
       cy.get(".oxd-input.oxd-input--active").eq(3).click().type(data.empId);
-      addRandomDigits(); // fix id
+      generateRandomEmployeeId(); // fix id
 
-      doo();
+      toggleLoginDetails();
 
       cy.get(".oxd-input.oxd-input--active").eq(5).click().type(data.userName);
 
@@ -265,21 +234,18 @@ describe("create new account on website", () => {
       cy.get(".oxd-input.oxd-input--active.orangehrm-firstname")
         .click()
         .type(data.firstName);
-      //   cy.get(".oxd-input.oxd-input--active.orangehrm-middlename")
-      //     .click()
-      //     .type(data.middleName);
 
       cy.get(".oxd-input.oxd-input--active.orangehrm-lastname")
         .click()
         .type(data.lastName);
 
       cy.get(".oxd-input.oxd-input--active").eq(3).click().type(data.empId);
-      addRandomDigits(); // fix id
+      generateRandomEmployeeId(); // fix id
 
-      doo();
+      toggleLoginDetails();
 
       cy.get(".oxd-input.oxd-input--active").eq(5).click().type(data.userName);
-      addRandomCharacter();
+      generateRandomUsername();
 
       cy.get(".oxd-input-group.oxd-input-field-bottom-space")
         .find("input[type='password']")
@@ -291,17 +257,7 @@ describe("create new account on website", () => {
         .eq(1)
         .type(data.password);
 
-      //////////////////validation
-
-      //   cy.intercept("GET","**/pim/viewPersonalDetails**").as( //2
-      //     "personalDetails",
-      //   );
-      //   cy.get(".oxd-button.oxd-button--medium").eq(1).click(); // save
-      //   cy.wait("@personalDetails").its("response.statusCode").should("eq", 200);
-
       cy.get(".oxd-button.oxd-button--medium").eq(1).click();
-      //   cy.get(".orangehrm-tabs-wrapper").should("have.length", 10); //1
-      //   cy.url().should("include", "/pim/viewPersonalDetails/empNumber/"); smth went wrong //3
     });
   });
 
@@ -320,9 +276,9 @@ describe("create new account on website", () => {
         .type(data.lastName);
 
       cy.get(".oxd-input.oxd-input--active").eq(3).click().type(data.empId);
-      addRandomDigits();
+      generateRandomEmployeeId();
 
-      doo();
+      toggleLoginDetails();
 
       cy.get(".oxd-input.oxd-input--active").eq(5).click().type("a");
 
@@ -345,7 +301,7 @@ describe("create new account on website", () => {
     });
   });
 
-  it("TC013: trying to add employee with less than (7 charactes) password ", () => {
+  it("TC013: trying to add employee with less than (7 characters) password ", () => {
     cy.fixture("task3Data").then((data) => {
       cy.get(".oxd-input.oxd-input--active.orangehrm-firstname")
         .click()
@@ -360,12 +316,12 @@ describe("create new account on website", () => {
         .type(data.lastName);
 
       cy.get(".oxd-input.oxd-input--active").eq(3).click().type(data.empId);
-      addRandomDigits();
+      generateRandomEmployeeId();
 
-      doo();
+      toggleLoginDetails();
 
       cy.get(".oxd-input.oxd-input--active").eq(5).click().type(data.userName);
-      addRandomCharacter();
+      generateRandomUsername();
 
       cy.get(".oxd-input-group.oxd-input-field-bottom-space")
         .find("input[type='password']")
@@ -401,12 +357,12 @@ describe("create new account on website", () => {
         .type(data.lastName);
 
       cy.get(".oxd-input.oxd-input--active").eq(3).click().type(data.empId);
-      addRandomDigits();
+      generateRandomEmployeeId();
 
-      doo();
+      toggleLoginDetails();
 
       cy.get(".oxd-input.oxd-input--active").eq(5).click().type(data.userName);
-      addRandomCharacter();
+      generateRandomUsername();
 
       //save
       cy.get(".oxd-button.oxd-button--medium").eq(1).click();
@@ -417,7 +373,7 @@ describe("create new account on website", () => {
     });
   });
 
-  it("TC015: trying to add employee with more than (6 charactes) password and all of them are digits", () => {
+  it("TC015: trying to add employee with more than (6 characters) password and all of them are digits", () => {
     cy.fixture("task3Data").then((data) => {
       cy.get(".oxd-input.oxd-input--active.orangehrm-firstname")
         .click()
@@ -432,12 +388,12 @@ describe("create new account on website", () => {
         .type(data.lastName);
 
       cy.get(".oxd-input.oxd-input--active").eq(3).click().type(data.empId);
-      addRandomDigits();
+      generateRandomEmployeeId();
 
-      doo();
+      toggleLoginDetails();
 
       cy.get(".oxd-input.oxd-input--active").eq(5).click().type(data.userName);
-      addRandomCharacter();
+      generateRandomUsername();
 
       cy.get(".oxd-input-group.oxd-input-field-bottom-space")
         .find("input[type='password']")
@@ -461,7 +417,7 @@ describe("create new account on website", () => {
     });
   });
 
-  it("TC016: trying to add employee with more than (6 charactes) password and all of them are characters", () => {
+  it("TC016: trying to add employee with more than (6 characters) password and all of them are characters", () => {
     cy.fixture("task3Data").then((data) => {
       cy.get(".oxd-input.oxd-input--active.orangehrm-firstname")
         .click()
@@ -476,12 +432,12 @@ describe("create new account on website", () => {
         .type(data.lastName);
 
       cy.get(".oxd-input.oxd-input--active").eq(3).click().type(data.empId);
-      addRandomDigits();
+      generateRandomEmployeeId();
 
-      doo();
+      toggleLoginDetails();
 
       cy.get(".oxd-input.oxd-input--active").eq(5).click().type(data.userName);
-      addRandomCharacter();
+      generateRandomUsername();
 
       cy.get(".oxd-input-group.oxd-input-field-bottom-space")
         .find("input[type='password']")
@@ -517,12 +473,12 @@ describe("create new account on website", () => {
         .type(data.lastName);
 
       cy.get(".oxd-input.oxd-input--active").eq(3).click().type(data.empId);
-      addRandomDigits();
+      generateRandomEmployeeId();
 
-      doo();
+      toggleLoginDetails();
 
       cy.get(".oxd-input.oxd-input--active").eq(5).click().type(data.userName);
-      addRandomCharacter();
+      generateRandomUsername();
 
       cy.get(".oxd-input-group.oxd-input-field-bottom-space")
         .find("input[type='password']")
@@ -556,9 +512,9 @@ describe("create new account on website", () => {
         .type(data.lastName);
 
       cy.get(".oxd-input.oxd-input--active").eq(3).click().type(data.empId);
-      addRandomDigits();
+      generateRandomEmployeeId();
 
-      doo();
+      toggleLoginDetails();
 
       cy.get(".oxd-input-group.oxd-input-field-bottom-space")
         .find("input[type='password']")
@@ -580,10 +536,10 @@ describe("create new account on website", () => {
   });
 
   it("TC019: trying to add employee with all valid fields", () => {
-    validEmpInfo();
+    fillEmployeeForm();
   });
 
-  it("TC020: trying to add employee with more than (6 charactes) password and all of them are digits and upper-case letter ", () => {
+  it("TC020: trying to add employee with more than (6 characters) password and all of them are digits and upper-case letter ", () => {
     cy.fixture("task3Data").then((data) => {
       cy.get(".oxd-input.oxd-input--active.orangehrm-firstname")
         .click()
@@ -598,11 +554,11 @@ describe("create new account on website", () => {
         .type(data.lastName);
 
       cy.get(".oxd-input.oxd-input--active").eq(3).click().type(data.empId);
-      addRandomDigits();
-      doo();
+      generateRandomEmployeeId();
+      toggleLoginDetails();
 
       cy.get(".oxd-input.oxd-input--active").eq(5).click().type(data.userName);
-      addRandomCharacter();
+      generateRandomUsername();
 
       cy.get(".oxd-input-group.oxd-input-field-bottom-space")
         .find("input[type='password']")
@@ -627,7 +583,7 @@ describe("create new account on website", () => {
   });
 
   it("TC021: fill personal details with multiple License Expiry Date", () => {
-    validEmpInfo();
+    fillEmployeeForm();
     fillPersonalDetails();
     let cnt = 0;
 
@@ -640,7 +596,6 @@ describe("create new account on website", () => {
             .clear()
             .type(element.licenseExpiryDate);
           cy.get(".oxd-button--secondary").eq(0).click(); //save1
-          cy.wait(1000);
           if (cnt < 3) {
             cy.contains(".oxd-input-group", "License Expiry Date").should(
               "contain.text",
@@ -659,7 +614,7 @@ describe("create new account on website", () => {
   });
 
   it("TC022: fill personal details with multiple Date Birth Date", () => {
-    validEmpInfo();
+    fillEmployeeForm();
     fillPersonalDetails();
     let cnt = 0;
 
@@ -671,7 +626,6 @@ describe("create new account on website", () => {
           .clear()
           .type(element.birthDate);
         cy.get(".oxd-button--secondary").eq(0).click(); //save1
-        cy.wait(1000);
         if (cnt < 3) {
           cy.contains(".oxd-input-group", "Date of Birth").should(
             "contain.text",
@@ -689,12 +643,11 @@ describe("create new account on website", () => {
   });
 
   it("TC023: fill all valid personal details and log out from admin account then log in with the new one", () => {
-    validEmpInfo();
+    fillEmployeeForm();
     fillPersonalDetails();
     fillValidDates();
 
     cy.get(".oxd-button--secondary").eq(0).click(); //save1
-    cy.wait(1000);
     cy.get(".oxd-button--secondary").eq(1).click(); //save2
 
     cy.get(".oxd-userdropdown-tab").click();
@@ -702,19 +655,19 @@ describe("create new account on website", () => {
 
     cy.fixture("task3Data").then((data) => {
       let userName = data.userName;
-      cy.get("input[name='username']").type(userName + userN);
+      cy.get("input[name='username']").type(
+        userName + generateRandomUsername(),
+      );
       cy.get("input[name='password']").type(data.password);
       cy.get("button[type='submit']").click();
-      //   cy.url().should("include", "/dashboard/");
     });
   });
 
   it("TC024: Verify that all employee information was saved correctly", () => {
-    validEmpInfo();
+    fillEmployeeForm();
     fillPersonalDetails();
     fillValidDates();
     cy.get(".oxd-button--secondary").eq(0).click(); //save1
-    cy.wait(1000);
     cy.get(".oxd-button--secondary").eq(1).click(); //save2
 
     cy.get(".oxd-userdropdown-tab").click();
@@ -722,10 +675,11 @@ describe("create new account on website", () => {
 
     cy.fixture("task3Data").then((data) => {
       let userName = data.userName;
-      cy.get("input[name='username']").type(userName + userN);
+      cy.get("input[name='username']").type(
+        userName + generateRandomUsername(),
+      );
       cy.get("input[name='password']").type(data.password);
       cy.get("button[type='submit']").click();
-      cy.wait(5000);
       cy.url().should("include", "/dashboard/");
     });
 
@@ -739,7 +693,7 @@ describe("create new account on website", () => {
       cy.get(".orangehrm-lastname").should("have.value", data.lastName);
 
       //verify employee Id
-      let value = data.empId + temId;
+      let value = data.empId + generateRandomEmployeeId();
       cy.contains(".oxd-grid-item", "Employee Id")
         .find("input")
         .should("have.value", value);
