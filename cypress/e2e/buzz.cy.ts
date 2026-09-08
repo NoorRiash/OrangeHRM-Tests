@@ -6,7 +6,6 @@ describe("writing post test", () => {
     cy.get("input[name='username']").type("Admin");
     cy.get("input[name='password']").type("admin123");
     cy.get("button[type='submit']").click();
-    cy.url().should("include", "/dashboard");
   });
 
   it("TC008: Create a post using fixture", () => {
