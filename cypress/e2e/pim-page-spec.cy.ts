@@ -520,7 +520,6 @@ describe("OrangeHRM - PIM Page Tests", () => {
         .eq(1)
         .type(data.password);
 
-      //save
       cy.get(".oxd-button.oxd-button--medium").eq(1).click();
       cy.get(".oxd-input-group.oxd-input-field-bottom-space")
         .eq(5)
