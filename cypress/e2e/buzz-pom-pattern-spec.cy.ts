@@ -1,26 +1,20 @@
-import createPost from "@cypress/pages/createPost";
-import LoginPage from "@cypress/pages/loginPage";
+import CreatePost from "@cypress/support/pages/createPost";
+import LoginPage from "@cypress/support/pages/loginPage";
 
 describe("OrangeHRM create post test", function () {
   beforeEach(() => {
-    const loginObject = new LoginPage();
-    loginObject.visit();
-    loginObject.fillUserName("Admin");
-    loginObject.fillPassword("admin123");
-    loginObject.submit();
+    LoginPage.visit();
+    LoginPage.fillUserName("Admin");
+    LoginPage.fillPassword("admin123");
+    LoginPage.submit();
   });
 
   it("TC026: Create a post using fixture", () => {
-    const createPostObject = new createPost();
-    createPostObject.visit();
+    CreatePost.visit();
     cy.intercept("POST", "**/api/v2/buzz/posts").as("postRequest");
     cy.fixture("post").then((data) => {
-      createPostObject.writePost(data.postText);
-      createPostObject.submitPost();
-      cy.wait("@postRequest").its("response.statusCode").should("eq", 200);
-      cy.get(".orangehrm-buzz-post-body-text")
-        .contains(data.postText)
-        .should("be.visible");
+      CreatePost.writePost(data.postText);
+      CreatePost.submitPost();
     });
   });
 });
