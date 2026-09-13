@@ -605,7 +605,7 @@ describe("OrangeHRM - PIM Page Tests", () => {
     );
   });
 
-  it.only("TC022: fill personal details with multiple Date Birth Date", () => {
+  it("TC022: fill personal details with multiple Date Birth Date", () => {
     fillEmployeeForm();
     fillPersonalDetails();
     let cnt = 0;
@@ -685,6 +685,10 @@ describe("OrangeHRM - PIM Page Tests", () => {
         .find("input")
         .should("have.value", value);
     });
+
+    cy.intercept("GET", "**/personal-details").as("myInfoDetails");
+    cy.get(".oxd-main-menu-item").contains("My Info").click();
+    cy.wait("@myInfoDetails").its("response.statusCode").should("eq", 200);
 
     cy.fixture("pimPageFillPersonalDetails").then((data) => {
       //verify other Id
