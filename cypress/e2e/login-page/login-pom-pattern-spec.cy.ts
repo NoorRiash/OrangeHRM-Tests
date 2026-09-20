@@ -4,7 +4,9 @@ describe("OrangeHRM login test", function () {
     LoginPage.visit();
     LoginPage.fillUserName("Admin");
     LoginPage.fillPassword("admin123");
+    cy.intercept("POST", "**auth/validate").as("postRequest");
     LoginPage.submit();
-    LoginPage.validation();
+    cy.wait("@postRequest").its("response.statusCode").should("eq", 302);
+    LoginPage.validLogin();
   });
 });

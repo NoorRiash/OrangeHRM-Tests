@@ -1,8 +1,11 @@
 class LoginPage {
-  static userName = "input[name='username']";
-  static password = "input[name='password']";
-  static button = "button[type='submit']";
-  static dashbordURL =
+  static LOCATORS = {
+    userName: "input[name='username']",
+    password: "input[name='password']",
+    button: "button[type='submit']",
+  };
+
+  static dashboardURL =
     "https://opensource-demo.orangehrmlive.com/web/index.php/dashboard/index";
 
   static visit() {
@@ -12,19 +15,19 @@ class LoginPage {
   }
 
   static fillUserName(value: string) {
-    cy.get(this.userName).type(value);
+    cy.get(this.LOCATORS.userName).type(value);
   }
 
   static fillPassword(value: string) {
-    cy.get(this.password).type(value);
+    cy.get(this.LOCATORS.password).type(value);
   }
 
   static submit() {
-    cy.get(this.button).click();
+    cy.get(this.LOCATORS.button).click();
   }
 
-  static validation() {
-    cy.url().should("eq", this.dashbordURL);
+  static validLogin() {
+    cy.url().should("eq", this.dashboardURL);
   }
 }
 

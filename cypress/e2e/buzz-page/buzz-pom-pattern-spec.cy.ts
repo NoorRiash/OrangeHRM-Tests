@@ -1,7 +1,7 @@
-import CreatePost from "@cypress/support/pages/createPost";
+import BuzzPage from "@cypress/support/pages/createPost";
 import LoginPage from "@cypress/support/pages/loginPage";
 
-describe("OrangeHRM create post test", function () {
+describe("OrangeHRM - Buzz Page - Create Posts Cases", function () {
   beforeEach(() => {
     LoginPage.visit();
     LoginPage.fillUserName("Admin");
@@ -10,11 +10,12 @@ describe("OrangeHRM create post test", function () {
   });
 
   it("TC026: Create a post using fixture", () => {
-    CreatePost.visit();
+    BuzzPage.visit();
     cy.intercept("POST", "**/api/v2/buzz/posts").as("postRequest");
     cy.fixture("post").then((data) => {
-      CreatePost.writePost(data.postText);
-      CreatePost.submitPost();
+      BuzzPage.writePost(data.postText);
+      BuzzPage.submitPost();
+      cy.wait("@postRequest").its("response.statusCode").should("eq", 200);
     });
   });
 });
