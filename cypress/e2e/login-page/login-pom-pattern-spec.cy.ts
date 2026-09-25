@@ -1,4 +1,4 @@
-import LoginPage from "@cypress/support/pages/loginPage";
+import LoginPage from "@cypress/support/pages/login-page";
 describe("OrangeHRM login test", function () {
   it("TC025: valid login test", () => {
     LoginPage.visit();

@@ -1,5 +1,5 @@
-import BuzzPage from "@cypress/support/pages/createPost";
-import LoginPage from "@cypress/support/pages/loginPage";
+import BuzzPage from "@cypress/support/pages/create-post";
+import LoginPage from "@cypress/support/pages/login-page";
 
 describe("OrangeHRM - Buzz Page - Create Posts Cases", function () {
   beforeEach(() => {
