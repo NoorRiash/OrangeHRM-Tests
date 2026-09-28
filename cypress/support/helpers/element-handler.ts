@@ -102,21 +102,27 @@ export default class ElementHandler {
     value,
     shouldType,
   }: {
-    selector: string;
+    selector?: string;
     containsText?: string;
     findSelector?: string;
     value: string;
     shouldType: string;
   }) {
-    let element = cy.get(selector);
-    if (containsText) {
-      element = cy.contains(selector, containsText);
-    }
+    let element;
+    if (selector) {
+      element = cy.get(selector);
+      if (containsText) {
+        element = cy.contains(selector, containsText);
+      }
 
-    if (findSelector) {
-      element = element.find(findSelector);
+      if (findSelector) {
+        element = element.find(findSelector);
+      }
+      element.should(shouldType, value);
+    } else if (value) {
+      cy.contains(value).should(shouldType);
+
     }
-    element.should(shouldType, value);
   }
 
   static contain({
@@ -140,4 +146,22 @@ export default class ElementHandler {
   static clear() {
     cy.clear();
   }
+
+  static findElement({
+    selector,
+    findSelector,
+    eqIndex,
+  }: {
+    selector: string;
+    findSelector: string;
+    eqIndex?: number;
+  }) {
+    let element = cy.get(selector).find(findSelector);
+    if (eqIndex !== undefined) {
+      element = element.eq(eqIndex);
+    }
+    return element;
+  }
+
+  
 }

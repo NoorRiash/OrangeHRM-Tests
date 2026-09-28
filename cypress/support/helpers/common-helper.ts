@@ -12,4 +12,24 @@ export default class CommonHelper {
     }
     return username;
   }
+
+  static wait_until_element_not_exist(
+    selector: string,
+    parentSelector: string = "body",
+    index: number = 0,
+  ) {
+    return new Cypress.Promise((resolve) => {
+      cy.get(parentSelector, { timeout: 30000 })
+        .eq(index)
+        .within(($body) => {
+          if ($body.find(selector).length) {
+            cy.get(selector, { timeout: 10000 })
+              .should("not.exist")
+              .then(resolve);
+          } else {
+            resolve();
+          }
+        });
+    });
+  }
 }

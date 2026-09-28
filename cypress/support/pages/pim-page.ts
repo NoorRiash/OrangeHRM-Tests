@@ -1,5 +1,6 @@
 import ApiHelper from "@cypress/support/helpers/api-helper";
 import ElementHandler from "@cypress/support/helpers/element-handler";
+import CommonHelper from "@cypress/support/helpers/common-helper";
 
 class PimPage {
   static LOCATORS = {
@@ -16,6 +17,26 @@ class PimPage {
     attachmentInput: "input[type='file']",
     saveButton: "button[type='submit']",
     attachmentActions: ".oxd-table-cell-action-space",
+    empTable: ".oxd-table.orangehrm-employee-list",
+    emplTableRow: ".oxd-table-row",
+    empActionIconButton: ".oxd-icon-button",
+    empActionButton: ".oxd-button",
+    confirmDeleteText: "Yes, Delete",
+    deleteSuccessMessage: "Successfully Deleted",
+    empIdLabel: "Employee Id",
+    myInfoMenuItem: ".oxd-main-menu-item",
+    myInfoText: "My Info",
+    loadingSpinner: ".oxd-loading-spinner",
+  };
+
+  static ALIASES = {
+    myInfoDetails: "myInfoDetails",
+  };
+
+  static API_ENDPOINTS = {
+    myInfoDetails: "**/personal-details",
+    // createEmployee: "**/api/v2/pim/employees",
+    // deleteEmployee: "**/api/v2/pim/employees/**",
   };
 
   static visitPimPage() {
@@ -366,6 +387,58 @@ class PimPage {
       .find('input[type="radio"]')
       .should("be.checked");
   }
+
+  static findEmpById(idTem: string) {
+    ElementHandler.type({
+      selector: this.LOCATORS.inputFieldGroup,
+      containsText: this.LOCATORS.empIdLabel,
+      value: idTem,
+    });
+    ElementHandler.click({ selector: ".orangehrm-left-space" });
+
+    let element = ElementHandler.findElement({
+      selector: this.LOCATORS.empTable,
+      findSelector: this.LOCATORS.emplTableRow,
+      eqIndex: 1,
+    });
+    this.deleteEmpFromTable(element);
+    // element.find(".oxd-icon-button").eq(1).click();
+    // cy.contains("button", "Yes, Delete").click();
+    // cy.contains("Successfully Deleted").should("be.visible");
+    // cy.reload();
+  }
+
+  static deleteEmpFromTable(element: Cypress.Chainable<JQuery<HTMLElement>>) {
+    ElementHandler.click({ selector: this.LOCATORS.empActionButton, index: 1 });
+    ElementHandler.click({
+      selector: this.LOCATORS.empActionButton,
+      containsText: this.LOCATORS.confirmDeleteText,
+    });
+    ElementHandler.assertValue({
+      value: this.LOCATORS.deleteSuccessMessage,
+      shouldType: "be.visible",
+    });
+  }
+
+  static goToMyInfoPage() {
+    ApiHelper.interceptRequest(
+      "GET",
+      this.API_ENDPOINTS.myInfoDetails,
+      this.ALIASES.myInfoDetails,
+    );
+    ElementHandler.click({
+      selector: this.LOCATORS.myInfoMenuItem,
+      containsText: this.LOCATORS.myInfoText,
+    });
+
+    CommonHelper.wait_until_element_not_exist(this.LOCATORS.loadingSpinner);
+    ApiHelper.waitForRequests([
+      { alias: `@${this.ALIASES.myInfoDetails}`, statusCode: 200 },
+    ]);
+  }
+
+
+
 }
 
 export default PimPage;
