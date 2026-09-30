@@ -10,7 +10,7 @@ Cypress.Commands.add(
     LoginPage.fillPassword(password);
     ApiHelper.interceptRequest("POST", "**/auth/validate", "postRequest");
     LoginPage.submit();
-    ApiHelper.waitForRequests([{ alias: "@postRequest", statusCode: 302 }]);
+    ApiHelper.waitForRequests([{ alias: "postRequest", statusCode: 302 }]);
     LoginPage.validLogin();
   },
 );

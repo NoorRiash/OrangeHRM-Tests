@@ -1,23 +1,19 @@
 import PimPage from "@cypress/support/pages/pim-page";
-import ElementHandler from "@cypress/support/helpers/element-handler";
 import CommonHelper from "@cypress/support/helpers/common-helper";
-import { CONSTANTS } from "@cypress/support/constants";
-import ApiHelper from "@cypress/support/helpers/api-helper";
 
-describe("migrate pim to pom", function () {
+describe("PIM (POM) - add employee with login details and fill personal details", function () {
   let usernameTem = "";
   let idTem = "";
 
   beforeEach(() => {
     cy.login();
-    PimPage.visitPimPage();
-    PimPage.clickOnAddEmp();
+    PimPage.visitPimPage("1", "2");
+    PimPage.clickOnAddEmp("1");
   });
 
   afterEach(() => {
-    // to delete
-    cy.login(CONSTANTS.adminUsername, CONSTANTS.adminPassword);
-    PimPage.visitPimPage();
+    cy.login();
+    PimPage.visitPimPage("1", "2");
     PimPage.findEmpById(idTem);
   });
 
@@ -38,23 +34,20 @@ describe("migrate pim to pom", function () {
       empInfo.userName = CommonHelper.generateRandomUsername();
       usernameTem = empInfo.userName;
       PimPage.fillUsername(usernameTem);
-      PimPage.status();
+      PimPage.selectEnabledStatus();
       PimPage.fillPassword(empInfo.password);
       PimPage.uploadProfilePicture("profilePic.jpg");
-      PimPage.saveAddEmp();
-
-      /////////fill personal details
+      PimPage.saveAddEmp("1", "2");
 
       cy.fixture("pimPageFillPersonalDetails").then((empPersonalDetails) => {
         PimPage.fillOtherId(empPersonalDetails.otherId);
         PimPage.fillLicenseNumber(empPersonalDetails.licenseNumber);
         PimPage.fillTestField(empPersonalDetails.testField);
-        PimPage.chooseGender("Female");
-        PimPage.chooseNationality("Greek");
-        PimPage.maritalStatus("Single");
-        PimPage.selectBloodType("A+");
+        PimPage.chooseGender(empPersonalDetails.gender);
+        PimPage.chooseNationality(empPersonalDetails.nationality);
+        PimPage.maritalStatus(empPersonalDetails.maritalStatus);
+        PimPage.selectBloodType(empPersonalDetails.bloodType);
         PimPage.fillValidDates(date1, date2);
-        cy.get(".oxd-button--text").click();
         PimPage.uploadAttachment("orangeHRM.xlsx");
         PimPage.saveAttachmentFile();
         PimPage.downloadAttachment();
@@ -63,11 +56,7 @@ describe("migrate pim to pom", function () {
         cy.logout();
 
         cy.login(usernameTem, empInfo.password);
-        //go to my info
-        PimPage.goToMyInfoPage();
-        
-
-        //verify full name
+        PimPage.goToMyInfoPage("1");
         PimPage.verifyFirstName(empInfo.firstName);
         PimPage.verifyMiddleName(empInfo.middleName);
         PimPage.verifyLastName(empInfo.lastName);
@@ -79,10 +68,10 @@ describe("migrate pim to pom", function () {
         PimPage.verifyTestField(empPersonalDetails.testField);
         PimPage.verifyLicenseExpiryDate(date2);
         PimPage.verifyDateOfBirth(date1);
-        PimPage.verifyNationality("Greek");
-        PimPage.verifyMaritalStatus("Single");
-        PimPage.verifyGender("Female");
-        PimPage.verifyBloodType("A+");
+        PimPage.verifyNationality(empPersonalDetails.nationality);
+        PimPage.verifyMaritalStatus(empPersonalDetails.maritalStatus);
+        PimPage.verifyGender(empPersonalDetails.gender);
+        PimPage.verifyBloodType(empPersonalDetails.bloodType);
 
         cy.logout();
       });

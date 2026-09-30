@@ -1,9 +1,18 @@
 export default class CommonHelper {
-  static generateRandomEmployeeId(length: number = 5) {
+  /**
+   * generate an employee id from the last 5 digits of the current timestamp
+   * @returns {string} the generated employee id
+   */
+  static generateRandomEmployeeId() {
     const id = Date.now().toString().slice(-5);
     return id;
   }
 
+  /**
+   * generate a random username made of english letters (upper and lower case)
+   * @param {number} [length=5] - the length of the username
+   * @returns {string} the generated username
+   */
   static generateRandomUsername(length: number = 5) {
     let username = "";
     const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
@@ -13,7 +22,14 @@ export default class CommonHelper {
     return username;
   }
 
-  static wait_until_element_not_exist(
+  /**
+   * wait until an element (like the loading spinner) does not exist inside the parent element
+   * @param {string} selector - the css selector of the element that should disappear
+   * @param {string} [parentSelector="body"] - the css selector of the parent element to search in
+   * @param {number} [index=0] - the index of the parent element if the selector returns multiple elements
+   * @returns {Cypress.Promise<void>} resolves when the element no longer exists
+   */
+  static waitUntilElementNotExist(
     selector: string,
     parentSelector: string = "body",
     index: number = 0,
