@@ -1,5 +1,9 @@
 {
   "otherId": "88",
   "licenseNumber": "123",
-  "testField": "xx"
+  "testField": "xx",
+  "gender": "Female",
+  "nationality": "Greek",
+  "maritalStatus": "Single",
+  "bloodType": "A+"
 }
